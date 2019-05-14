@@ -42,7 +42,10 @@
 		}
 	},
 	"devDependencies": {
-	"electron": "3.0.10",
-	"electron-builder": "^20.38.2"
+		"electron": "3.0.10",
+		"electron-builder": "^20.38.2"
+	},
+	"dependencies": {
+		"mpris-service": "^2.1.0"
 	}
 }

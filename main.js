@@ -1,5 +1,6 @@
 const electron = require( "electron" );
 const { shell, app, BrowserWindow, globalShortcut } = electron;
+const mpris = require( "mpris-service" );
 const HOMEPAGE = "https://play.pocketcasts.com/web/"
 
 let mainWindow;
@@ -16,6 +17,28 @@ app.on( "ready", () => {
 	window.setMenuBarVisibility( false );
 	window.loadURL( HOMEPAGE );
 
+  const player = mpris({
+    name: 'pocket_casts',
+    identity: 'Pocket Casts',
+    supportedInterfaces: ['player'],
+    desktopEntry: 'pocket-casts-linux',
+	});
+
+  player.playbackStatus = 'Stopped';
+	player.canEditTracks = false;
+
+  player.on('playpause', () => {
+		window.webContents.executeJavaScript( "document.querySelector( '.play_pause_button' ).click()");
+  });
+
+  player.on('next', () => {
+		window.webContents.executeJavaScript( "document.querySelector( '.skip_forward_button' ).click()");
+  });
+
+  player.on('previous', () => {
+		window.webContents.executeJavaScript( "document.querySelector( '.skip_back_button' ).click()");
+  });
+
 	window.webContents.on( "will-navigate", ( ev, url ) => {
 		parts = url.split( '/' );
 
@@ -23,17 +46,6 @@ app.on( "ready", () => {
 			ev.preventDefault();
 			shell.openExternal( url );
 		}
-	});
-
-	// Register media controls
-	globalShortcut.register( 'MediaPlayPause', () => {
-		window.webContents.executeJavaScript( "document.querySelector( '.play_pause_button' ).click()");
-	});
-	globalShortcut.register( 'MediaPreviousTrack', () => {
-		window.webContents.executeJavaScript( "document.querySelector( '.skip_back_button' ).click()");
-	});
-	globalShortcut.register( 'MediaNextTrack', () => {
-		window.webContents.executeJavaScript( "document.querySelector( '.skip_forward_button' ).click()");
 	});
 
 	window.on( "closed", () => {
